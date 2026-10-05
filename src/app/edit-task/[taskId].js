@@ -1,13 +1,3 @@
-import React from 'react';
-import { Pressable, Text } from 'react-native';
-import { useLocalSearchParams } from 'expo-router';
-import TaskForm from '@/components/TaskForm';
-import { BackIcon } from '@/components/Icons';
-import { Screen } from '@/components/Common';
-import { useApp } from '@/state/AppContext';
-import { useSafeBack } from '@/utils/useSafeBack';
-import { styles } from '@/styles/edit-task.styles';
-
 /**
  * EDIT TASK SCREEN (modal, opened by tapping "Edit" on a task)
  * -----------------------------------------------------------------------------
@@ -15,12 +5,22 @@ import { styles } from '@/styles/edit-task.styles';
  * task's current values (`initial={task}`) and calls
  * updateTask() instead of addTask() on save.
  */
+import React from 'react';
+import { Pressable, StyleSheet, Text } from 'react-native';
+import { useLocalSearchParams } from 'expo-router';
+import { colors } from '@/constants/theme';
+import TaskForm from '@/components/TaskForm';
+import { BackIcon } from '@/components/Icons';
+import { Screen } from '@/components/Common';
+import { useApp } from '@/state/AppContext';
+import { useSafeBack } from '@/utils/useSafeBack';
+
 export default function EditTaskScreen() {
   const { taskId } = useLocalSearchParams();
   const goBack = useSafeBack();
   const { tasks, updateTask } = useApp();
 
-  const task = tasks.find(x => x.id === taskId);
+  const task = tasks.find(item => item.id === taskId);
 
   // The form (and all of its hooks) only mounts once we know the task exists,
   // so hook order is stable across renders.
@@ -47,3 +47,8 @@ export default function EditTaskScreen() {
     />
   );
 }
+
+const styles = StyleSheet.create({
+  back: { padding: 4, alignSelf: 'flex-start', marginLeft: 16, marginTop: 12 },
+  notFound: { padding: 20, color: colors.muted },
+});

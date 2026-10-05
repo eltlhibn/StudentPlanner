@@ -10,14 +10,13 @@
  * - New tasks are added from the "Add Task" tab.
  */
 import React, { useState } from 'react';
-import { FlatList, Text, TextInput, View } from 'react-native';
+import { FlatList, StyleSheet, Text, TextInput, View } from 'react-native';
 import { colors } from '@/constants/theme';
 import { useApp } from '@/state/AppContext';
 import { ClipboardEmptyIcon, SearchIcon } from '@/components/Icons';
 import TaskCard from '@/components/TaskCard';
 import { EmptyState, Screen } from '@/components/Common';
 import { sortByDeadline } from '@/utils/deadlines';
-import { styles } from '@/styles/tasks.styles';
 
 export default function TasksScreen() {
   const { tasks } = useApp();
@@ -30,13 +29,14 @@ export default function TasksScreen() {
 
   // Keep only the open tasks that match the search text (title or subject),
   // then sort them so the nearest deadline comes first.
-  const open = tasks.filter(a => !a.done);
-  const text = search.trim().toLowerCase();
-  const filtered = sortByDeadline(
-    open.filter(
-      a => a.title.toLowerCase().includes(text) || (a.subject ?? '').toLowerCase().includes(text),
-    ),
+  const openTasks = tasks.filter(task => !task.done);
+  const searchText = search.trim().toLowerCase();
+  const matchingTasks = openTasks.filter(
+    task =>
+      task.title.toLowerCase().includes(searchText) ||
+      (task.subject || '').toLowerCase().includes(searchText),
   );
+  const visibleTasks = sortByDeadline(matchingTasks);
 
   return (
     <Screen>
@@ -47,8 +47,8 @@ export default function TasksScreen() {
       {/* FlatList = the scrollable list of task cards. It builds one TaskCard for each item in `data`. */}
       <FlatList
         style={{ flex: 1 }}
-        data={filtered}
-        keyExtractor={item => item.id}
+        data={visibleTasks}
+        keyExtractor={task => task.id}
         renderItem={({ item }) => <TaskCard task={item} />}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
@@ -63,7 +63,7 @@ export default function TasksScreen() {
                 <Text style={styles.dateTitle}>Today's Schedule</Text>
               </View>
               <Text style={styles.taskCount}>
-                {filtered.length} task{filtered.length !== 1 ? 's' : ''} planned
+                {visibleTasks.length} task{visibleTasks.length !== 1 ? 's' : ''} planned
               </Text>
             </View>
 
@@ -86,9 +86,9 @@ export default function TasksScreen() {
         ListEmptyComponent={
           <EmptyState
             icon={<ClipboardEmptyIcon />}
-            title={open.length === 0 ? 'No tasks yet' : 'No matching tasks'}
+            title={openTasks.length === 0 ? 'No tasks yet' : 'No matching tasks'}
             body={
-              open.length === 0
+              openTasks.length === 0
                 ? 'Open the Add Task tab to add your first task.'
                 : 'Try a different search.'
             }
@@ -99,3 +99,44 @@ export default function TasksScreen() {
     </Screen>
   );
 }
+
+const styles = StyleSheet.create({
+  // Page header: left-aligned, lines up with the search bar and cards (20px side padding).
+  header: {
+    alignItems: 'flex-start',
+    paddingHorizontal: 20,
+    paddingTop: 16,
+    paddingBottom: 8,
+  },
+  headerTitle: {
+    fontSize: 28,
+    lineHeight: 34,
+    fontWeight: '700',
+    letterSpacing: -0.3,
+    color: colors.text,
+  },
+  dateRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    justifyContent: 'space-between',
+    paddingHorizontal: 20,
+    paddingTop: 8,
+    paddingBottom: 16,
+  },
+  dateLabel: { fontSize: 11, color: colors.muted, fontWeight: '500', letterSpacing: 0.5 },
+  dateTitle: { fontSize: 16, fontWeight: '600', color: colors.text, marginTop: 2 },
+  taskCount: { fontSize: 12, color: colors.muted },
+  searchRow: { paddingHorizontal: 20, marginBottom: 12 },
+  searchBox: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colors.card,
+    borderRadius: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    gap: 8,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  searchInput: { flex: 1, fontSize: 14, color: colors.text, padding: 0 },
+});

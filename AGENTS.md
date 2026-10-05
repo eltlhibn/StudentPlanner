@@ -25,36 +25,39 @@ src/
 │  │  ├─ add-task.js    Add Task
 │  │  └─ completed.js   Completed Tasks
 │  └─ task/
-│     ├─ [taskId].js        Task details (/task/<id>)
-│     └─ edit/[taskId].js   Edit task (modal, /task/edit/<id>)
+│     └─ [taskId].js        Task details (/task/<id>)
+│  ├─ edit-task/
+│     └─ [taskId].js        Edit task (modal, /edit-task/<id>)
 ├─ components/          Reusable components only (flat)
 │  ├─ Common.js         Screen, Field, Checkbox, PriorityBadge, EmptyState, FormHeader
 │  ├─ Icons.js          react-native-svg icons
 │  ├─ TaskCard.js
 │  └─ TaskForm.js       Shared by Add Task and Edit Task
-├─ styles/              ALL StyleSheets, one file per component or screen (*.styles.js)
 ├─ constants/theme.js   Colours and priority colours
-├─ state/AppContext.js  All app state + AsyncStorage persistence. Exposes useApp()
-└─ utils/               createId, confirmDelete, deadlines, useSafeBack
+├─ state/AppContext.js  All app state + AsyncStorage persistence + createId(). Exposes useApp()
+└─ utils/               confirmDelete, deadlines, useSafeBack
 ```
 
-Rule of thumb: components in `components/`, their styles in `styles/` (named after the component, e.g. `TaskCard.js` -> `styles/task-card.styles.js`; screens likewise, e.g. `app/(tabs)/index.js` -> `styles/tasks.styles.js`). Keep non-screen code out of `src/app`.
+Rule of thumb: components live in `components/`, screens in `app/`, and each file keeps its own
+`StyleSheet` at the bottom (so a screen and its styles are always read together). Keep non-screen
+code out of `src/app`.
 
 The data shape is `Task = { id, title, subject, priority, dueDate, notes, done }`, where `subject` is plain text. It is described at the top of `AppContext.js`. Saves from older versions (`assignments`, `subjectId`) are migrated on load.
 
 ## Conventions and gotchas
 
-- **Styling:** React Native `StyleSheet`. Shared colours come from `src/constants/theme.js`; do not hard-code new hex values in screens.
+- **Styling:** React Native `StyleSheet`, defined at the bottom of the file that uses it. Shared colours come from `src/constants/theme.js`; do not hard-code new hex values in screens.
+- **Forms:** `TaskForm` requires Title, Priority and Deadline. `findMissingFields()` returns one message per empty required field and the messages only appear after the first save attempt (`hasTriedToSave`). Priority starts as `''` on Add Task so nothing is preselected; Edit Task seeds it from the saved task.
 - **Persistence:** `AppContext` loads from AsyncStorage first and only saves once `ready` is true. Do not add a save path that runs before the initial load, or stored data will be overwritten.
-- **Hooks:** Never call hooks after an early return. When a screen depends on a record that may not exist (e.g. `/task/edit/[id]`), render a not-found view and mount the hook-using component only when the record exists.
+- **Hooks:** Never call hooks after an early return. When a screen depends on a record that may not exist (e.g. `/edit-task/[id]`), render a not-found view and mount the hook-using component only when the record exists.
 - **Navigation back:** use `useSafeBack()` instead of `router.back()`, so modals opened directly (deep link, web refresh) still have somewhere to go.
 - **Confirmations:** use `confirmDelete()` from `src/utils/confirmDelete.js`. `Alert.alert` does nothing on web.
-- **Due dates** are free text. `src/utils/deadlines.js` parses common formats ("Dec 5", "12/5", "2026-12-05") for sorting; unparseable dates sort last.
+- **Due dates** are free text. `src/utils/deadlines.js` parses common formats ("Dec 5", "12/5", "2026-12-05") for sorting; unparseable dates sort last. A date picked in the calendar is saved as `YYYY-MM-DD` by `formatDate()`, which is the first format `parseDueDate()` understands — so picking a date never needs sorting changes. The calendar (`@react-native-community/datetimepicker`) has **no web support**, so the calendar button is hidden with `Platform.OS !== 'web'` and web users type the date.
 - **Safe areas:** use `Screen` from `@/components/Common` (wraps `react-native-safe-area-context`). Do not use `SafeAreaView` from `react-native`.
 - **Tabs import:** `Tabs` comes from `expo-router/js-tabs` (the `expo-router` export is deprecated in SDK 57).
 - **Dependencies:** install native modules with `npx expo install <pkg>` so versions match the SDK.
 
 ## Dependencies
 
-- Runtime: Expo SDK 57, React 19, React Native 0.86, Expo Router, react-native-svg, AsyncStorage, react-native-safe-area-context, react-native-screens.
+- Runtime: Expo SDK 57, React 19, React Native 0.86, Expo Router, react-native-svg, AsyncStorage, react-native-safe-area-context, react-native-screens, `@react-native-community/datetimepicker` (calendar, included in Expo Go).
 - Web preview: react-native-web, react-dom.

@@ -7,27 +7,27 @@
  * - Unticking a task's checkbox sends it back to the Tasks tab.
  */
 import React from 'react';
-import { FlatList, Pressable, Text, View } from 'react-native';
+import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
+import { colors } from '@/constants/theme';
 import { useApp } from '@/state/AppContext';
 import { CheckEmptyIcon } from '@/components/Icons';
 import TaskCard from '@/components/TaskCard';
 import { EmptyState, Screen } from '@/components/Common';
 import { confirmDelete } from '@/utils/confirmDelete';
 import { sortByDeadline } from '@/utils/deadlines';
-import { styles } from '@/styles/completed.styles';
 
 export default function CompletedScreen() {
   const { tasks, deleteTask, clearCompletedTasks } = useApp();
 
-  const completed = sortByDeadline(tasks.filter(a => a.done));
+  const completedTasks = sortByDeadline(tasks.filter(task => task.done));
 
-  const handleDeleteOne = a =>
-    confirmDelete('Delete Task', `Delete "${a.title}"?`, 'Delete', () => deleteTask(a.id));
+  const handleDeleteOne = task =>
+    confirmDelete('Delete Task', `Delete "${task.title}"?`, 'Delete', () => deleteTask(task.id));
 
   const handleDeleteAll = () =>
     confirmDelete(
       'Delete All Completed',
-      `Delete all ${completed.length} completed task${completed.length !== 1 ? 's' : ''}? This cannot be undone.`,
+      `Delete all ${completedTasks.length} completed task${completedTasks.length !== 1 ? 's' : ''}? This cannot be undone.`,
       'Delete All',
       clearCompletedTasks,
     );
@@ -36,7 +36,7 @@ export default function CompletedScreen() {
     <Screen>
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Completed Tasks</Text>
-        {completed.length > 0 && (
+        {completedTasks.length > 0 && (
           <Pressable
             onPress={handleDeleteAll}
             hitSlop={8}
@@ -50,14 +50,14 @@ export default function CompletedScreen() {
 
       <FlatList
         style={{ flex: 1 }}
-        data={completed}
-        keyExtractor={item => item.id}
+        data={completedTasks}
+        keyExtractor={task => task.id}
         renderItem={({ item }) => <TaskCard task={item} onDelete={() => handleDeleteOne(item)} />}
         showsVerticalScrollIndicator={false}
         ListHeaderComponent={
-          completed.length > 0 ? (
+          completedTasks.length > 0 ? (
             <Text style={styles.count}>
-              {completed.length} completed task{completed.length !== 1 ? 's' : ''}
+              {completedTasks.length} completed task{completedTasks.length !== 1 ? 's' : ''}
             </Text>
           ) : null
         }
@@ -73,3 +73,29 @@ export default function CompletedScreen() {
     </Screen>
   );
 }
+
+const styles = StyleSheet.create({
+  // Page header: title on the left, "Delete all" on the right, on the same row.
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 20,
+    paddingTop: 16,
+    paddingBottom: 12,
+  },
+  headerTitle: {
+    fontSize: 28,
+    lineHeight: 34,
+    fontWeight: '700',
+    letterSpacing: -0.3,
+    color: colors.text,
+  },
+  // Normal (not absolute) so it can never overlap the title.
+  deleteAllBtn: {
+    paddingVertical: 6,
+    paddingLeft: 12,
+  },
+  deleteAllText: { fontSize: 14, fontWeight: '600', color: colors.danger },
+  count: { paddingHorizontal: 20, paddingTop: 4, paddingBottom: 12, fontSize: 12, color: colors.muted },
+});

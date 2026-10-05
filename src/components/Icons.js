@@ -88,6 +88,16 @@ export function TrashIcon({ size = 18, color = '#EF4444', strokeWidth = 2 }) {
   );
 }
 
+/** Calendar (the button next to the Due Date field). */
+export function CalendarIcon({ size = 20, color = '#6B7280', strokeWidth = 2 }) {
+  return (
+    <Svg width={size} height={size} {...base}>
+      <Rect x={3} y={5} width={18} height={16} rx={2} stroke={color} strokeWidth={strokeWidth} />
+      <Path d="M3 10h18M8 3v4M16 3v4" stroke={color} strokeWidth={strokeWidth} {...round} />
+    </Svg>
+  );
+}
+
 /** Large empty-state check circle (Completed). */
 export function CheckEmptyIcon({ size = 36, color = '#C4B5FD' }) {
   return (

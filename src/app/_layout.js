@@ -32,7 +32,7 @@ function RootNavigator() {
     <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.bg } }}>
       <Stack.Screen name="(tabs)" />
       <Stack.Screen name="task/[taskId]" options={{ animation: 'slide_from_right' }} />
-      <Stack.Screen name="task/edit/[taskId]" options={{ presentation: 'modal' }} />
+      <Stack.Screen name="edit-task/[taskId]" options={{ presentation: 'modal' }} />
     </Stack>
   );
 }

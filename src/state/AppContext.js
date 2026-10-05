@@ -15,8 +15,8 @@
  */
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { createId } from '@/utils/createId';
 
+// The single key we save our data under.
 const STORAGE_KEY = 'study_tracker_data';
 
 /**
@@ -35,24 +35,38 @@ const STORAGE_KEY = 'study_tracker_data';
  */
 const AppContext = createContext(null);
 
+/** Builds a short unique id for a new task (time + a bit of randomness). */
+function createId() {
+  return Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+}
+
 /**
- * Read saved data, including data saved by older versions of the app:
- *  - Older saves used the key `assignments` instead of `tasks`.
- *  - Even older saves used { subjects, assignments } with `subjectId` on each item;
- *    the subject's name becomes plain subject text.
+ * Turns the raw saved data into a plain list of tasks.
+ * It also understands data written by OLDER versions of the app, so a student never
+ * loses their tasks when the app is updated:
+ *  - Older saves kept the list under the name `assignments` instead of `tasks`.
+ *  - Even older saves had a separate list of subjects and linked each assignment to
+ *    one with `subjectId`; here that link is turned into plain subject text.
  */
-function readTasks(data) {
-  const list = Array.isArray(data?.tasks)
-    ? data.tasks
-    : Array.isArray(data?.assignments)
-      ? data.assignments
-      : [];
-  const legacySubjects = Array.isArray(data?.subjects) ? data.subjects : [];
-  return list.map(item => {
-    const { subjectId, ...rest } = item;
-    if (typeof rest.subject === 'string') return rest;
-    const legacy = legacySubjects.find(s => s.id === subjectId);
-    return { ...rest, subject: legacy?.name || legacy?.code || '' };
+function readTasks(savedData) {
+  const data = savedData || {};
+
+  // Which list did this version save?
+  let savedList = [];
+  if (Array.isArray(data.tasks)) savedList = data.tasks;
+  else if (Array.isArray(data.assignments)) savedList = data.assignments;
+
+  // Only needed for the very old format.
+  const oldSubjects = Array.isArray(data.subjects) ? data.subjects : [];
+
+  return savedList.map(item => {
+    // Drop subjectId: today's format stores the subject as plain text.
+    const { subjectId, ...task } = item;
+    if (typeof task.subject === 'string') return task;
+
+    // Find the old subject this assignment pointed at and use its name.
+    const oldSubject = oldSubjects.find(subject => subject.id === subjectId);
+    return { ...task, subject: (oldSubject && oldSubject.name) || '' };
   });
 }
 
@@ -90,20 +104,20 @@ export function AppProvider({ children }) {
   }
 
   function updateTask(id, changes) {
-    setTasks(prev => prev.map(t => (t.id === id ? { ...t, ...changes } : t)));
+    setTasks(prev => prev.map(task => (task.id === id ? { ...task, ...changes } : task)));
   }
 
   function deleteTask(id) {
-    setTasks(prev => prev.filter(t => t.id !== id));
+    setTasks(prev => prev.filter(task => task.id !== id));
   }
 
   function toggleTaskDone(id) {
-    setTasks(prev => prev.map(t => (t.id === id ? { ...t, done: !t.done } : t)));
+    setTasks(prev => prev.map(task => (task.id === id ? { ...task, done: !task.done } : task)));
   }
 
   // Used by the Completed tab's "Delete all" button.
   function clearCompletedTasks() {
-    setTasks(prev => prev.filter(t => !t.done));
+    setTasks(prev => prev.filter(task => !task.done));
   }
 
   return (

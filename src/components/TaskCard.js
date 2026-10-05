@@ -1,11 +1,10 @@
 import React from 'react';
-import { Pressable, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { colors } from '@/constants/theme';
 import { useApp } from '@/state/AppContext';
 import { Checkbox, PriorityBadge } from '@/components/Common';
 import { TrashIcon } from '@/components/Icons';
-import { styles } from '@/styles/task-card.styles';
 
 /**
  * TASK CARD
@@ -15,25 +14,27 @@ import { styles } from '@/styles/task-card.styles';
  * - Tapping the round checkbox marks the task done/not done without leaving this screen.
  * - If `onDelete` is passed (Completed tab), a trash button is shown on the right.
  */
-export default function TaskCard({ task: a, showSubject = true, accent = colors.primary, onDelete }) {
+export default function TaskCard({ task, onDelete }) {
   const router = useRouter();
   const { toggleTaskDone } = useApp();
 
-  const meta = showSubject ? a.subject || 'No subject' : null;
-
   return (
     <Pressable
-      onPress={() => router.push(`/task/${a.id}`)}
+      onPress={() => router.push(`/task/${task.id}`)}
       accessibilityRole="button"
-      style={({ pressed }) => [styles.card, a.done && styles.cardDone, pressed && { opacity: 0.85 }]}
+      style={({ pressed }) => [
+        styles.card,
+        task.done && styles.cardDone,
+        pressed && { opacity: 0.85 },
+      ]}
     >
       <View style={styles.row}>
-        <Checkbox checked={a.done} onPress={() => toggleTaskDone(a.id)} color={accent} />
+        <Checkbox checked={task.done} onPress={() => toggleTaskDone(task.id)} />
         <View style={styles.content}>
-          <Text style={[styles.title, a.done && styles.titleDone]}>{a.title}</Text>
-          <PriorityBadge priority={a.priority} />
-          {meta ? <Text style={styles.meta}>{meta}</Text> : null}
-          {a.dueDate ? <Text style={styles.meta}>Due {a.dueDate}</Text> : null}
+          <Text style={[styles.title, task.done && styles.titleDone]}>{task.title}</Text>
+          <PriorityBadge priority={task.priority} />
+          <Text style={styles.meta}>{task.subject || 'No subject'}</Text>
+          {task.dueDate ? <Text style={styles.meta}>Due {task.dueDate}</Text> : null}
         </View>
         {onDelete ? (
           <Pressable
@@ -41,7 +42,7 @@ export default function TaskCard({ task: a, showSubject = true, accent = colors.
             hitSlop={10}
             style={styles.deleteBtn}
             accessibilityRole="button"
-            accessibilityLabel={`Delete ${a.title}`}
+            accessibilityLabel={`Delete ${task.title}`}
           >
             <TrashIcon />
           </Pressable>
@@ -50,3 +51,25 @@ export default function TaskCard({ task: a, showSubject = true, accent = colors.
     </Pressable>
   );
 }
+
+const styles = StyleSheet.create({
+  card: {
+    marginHorizontal: 20,
+    marginBottom: 12,
+    backgroundColor: colors.card,
+    borderRadius: 16,
+    padding: 16,
+    shadowColor: '#000',
+    shadowOpacity: 0.04,
+    shadowRadius: 4,
+    shadowOffset: { width: 0, height: 1 },
+    elevation: 1,
+  },
+  cardDone: { opacity: 0.55 },
+  row: { flexDirection: 'row', gap: 12 },
+  content: { flex: 1, gap: 5 },
+  title: { fontSize: 15, fontWeight: '700', color: colors.text },
+  titleDone: { textDecorationLine: 'line-through', color: colors.faint },
+  meta: { fontSize: 13, color: colors.muted },
+  deleteBtn: { padding: 4, alignSelf: 'flex-start' },
+});
