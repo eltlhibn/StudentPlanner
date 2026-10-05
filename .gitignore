@@ -1,1 +1,31 @@
-node_modules
+# Dependencies
+node_modules/
+
+# Expo
+.expo/
+dist/
+web-build/
+expo-env.d.ts
+
+# Native build output & signing keys
+*.orig.*
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+*.ipa
+*.aab
+
+# Logs & OS files
+*.log
+npm-debug.log*
+yarn-error.log*
+.DS_Store
+
+# Local env / secrets
+.env
+.env*.local
+
+# Local tooling worktrees (duplicate copies of the project)
+.kilo/worktrees/

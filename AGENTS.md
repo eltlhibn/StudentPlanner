@@ -28,7 +28,7 @@ src/
 │     ├─ [taskId].js        Task details (/task/<id>)
 │     └─ edit/[taskId].js   Edit task (modal, /task/edit/<id>)
 ├─ components/          Reusable components only (flat)
-│  ├─ Common.js         Screen, Field, Checkbox, PriorityBadge, EmptyState, FormHeader, Chip...
+│  ├─ Common.js         Screen, Field, Checkbox, PriorityBadge, EmptyState, FormHeader
 │  ├─ Icons.js          react-native-svg icons
 │  ├─ TaskCard.js
 │  └─ TaskForm.js       Shared by Add Task and Edit Task
@@ -48,9 +48,9 @@ The data shape is `Task = { id, title, subject, priority, dueDate, notes, done }
 - **Persistence:** `AppContext` loads from AsyncStorage first and only saves once `ready` is true. Do not add a save path that runs before the initial load, or stored data will be overwritten.
 - **Hooks:** Never call hooks after an early return. When a screen depends on a record that may not exist (e.g. `/task/edit/[id]`), render a not-found view and mount the hook-using component only when the record exists.
 - **Navigation back:** use `useSafeBack()` instead of `router.back()`, so modals opened directly (deep link, web refresh) still have somewhere to go.
-- **Confirmations:** use `confirmDestructive()` from `src/utils/confirm.js`. `Alert.alert` does nothing on web.
-- **Due dates** are free text. `src/utils/dates.js` parses common formats ("Dec 5", "12/5", "2026-12-05") for sorting; unparseable dates sort last.
-- **Safe areas:** use `Screen` from `@/components/common/ui` (wraps `react-native-safe-area-context`). Do not use `SafeAreaView` from `react-native`.
+- **Confirmations:** use `confirmDelete()` from `src/utils/confirmDelete.js`. `Alert.alert` does nothing on web.
+- **Due dates** are free text. `src/utils/deadlines.js` parses common formats ("Dec 5", "12/5", "2026-12-05") for sorting; unparseable dates sort last.
+- **Safe areas:** use `Screen` from `@/components/Common` (wraps `react-native-safe-area-context`). Do not use `SafeAreaView` from `react-native`.
 - **Tabs import:** `Tabs` comes from `expo-router/js-tabs` (the `expo-router` export is deprecated in SDK 57).
 - **Dependencies:** install native modules with `npx expo install <pkg>` so versions match the SDK.
 

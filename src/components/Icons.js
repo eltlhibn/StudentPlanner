@@ -26,14 +26,6 @@ export function TasksIcon({ size = 22, color = '#9CA3AF', strokeWidth = 2 }) {
   );
 }
 
-export function PlusIcon({ size = 16, color = '#4F46E5', strokeWidth = 2 }) {
-  return (
-    <Svg width={size} height={size} {...base}>
-      <Path d="M12 5v14M5 12h14" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" />
-    </Svg>
-  );
-}
-
 export function SearchIcon({ size = 18, color = '#6B7280', strokeWidth = 2 }) {
   return (
     <Svg width={size} height={size} {...base}>
@@ -51,36 +43,10 @@ export function BackIcon({ size = 20, color = '#111827', strokeWidth = 2 }) {
   );
 }
 
-export function ChevronRightIcon({ size = 16, color = '#9CA3AF', strokeWidth = 2 }) {
-  return (
-    <Svg width={size} height={size} {...base}>
-      <Path d="M9 18l6-6-6-6" stroke={color} strokeWidth={strokeWidth} {...round} />
-    </Svg>
-  );
-}
-
 export function CheckIcon({ size = 12, color = '#FFFFFF', strokeWidth = 2.5 }) {
   return (
     <Svg width={size} height={size} {...base}>
       <Path d="M20 6L9 17l-5-5" stroke={color} strokeWidth={strokeWidth} {...round} />
-    </Svg>
-  );
-}
-
-export function CloseIcon({ size = 14, color = '#6B7280', strokeWidth = 2 }) {
-  return (
-    <Svg width={size} height={size} {...base}>
-      <Path d="M18 6L6 18M6 6l12 12" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" />
-    </Svg>
-  );
-}
-
-export function MoreIcon({ size = 20, color = '#111827' }) {
-  return (
-    <Svg width={size} height={size} {...base}>
-      <Circle cx={12} cy={5} r={1.5} fill={color} />
-      <Circle cx={12} cy={12} r={1.5} fill={color} />
-      <Circle cx={12} cy={19} r={1.5} fill={color} />
     </Svg>
   );
 }

@@ -95,10 +95,6 @@ export function Field({ label, style, ...props }) {
   );
 }
 
-export function FormLabel({ children }) {
-  return <Text style={styles.label}>{children}</Text>;
-}
-
 /** Top bar for modal forms: Cancel · Title · Save. */
 export function FormHeader({
   title,
@@ -122,25 +118,5 @@ export function FormHeader({
         <Text style={[styles.saveText, saveDisabled && { opacity: 0.4 }]}>Save</Text>
       </Pressable>
     </View>
-  );
-}
-
-/** Selectable pill used for filters and pickers. */
-export function Chip({
-  label,
-  active,
-  onPress,
-  children,
-}) {
-  return (
-    <Pressable
-      onPress={onPress}
-      accessibilityRole="button"
-      accessibilityState={{ selected: !!active }}
-      style={[styles.chip, active && styles.chipActive]}
-    >
-      <Text style={[styles.chipText, active && styles.chipTextActive]}>{label}</Text>
-      {children}
-    </Pressable>
   );
 }

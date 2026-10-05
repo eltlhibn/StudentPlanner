@@ -10,7 +10,6 @@
 export const colors = {
   primary: '#4F46E5',
   primarySoft: '#EEF2FF',
-  lavender: '#C4B5FD',
   lavenderSoft: '#F5F3FF',
   bg: '#F4F5FA',
   card: '#FFFFFF',
@@ -21,7 +20,6 @@ export const colors = {
   muted: '#6B7280',
   faint: '#9CA3AF',
   danger: '#EF4444',
-  success: '#10B981',
   white: '#FFFFFF',
 };
 

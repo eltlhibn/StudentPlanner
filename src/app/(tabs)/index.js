@@ -3,7 +3,7 @@
  * ------------------------------------------
  * This is the first thing the user sees. It lists all tasks that are NOT done yet
  * (finished tasks live in the Completed tab; ticking a task's checkbox moves it there).
- * - Tasks always come out sorted by nearest deadline (see utils/dates.js -> sortByDeadline),
+ * - Tasks always come out sorted by nearest deadline (see utils/deadlines.js -> sortByDeadline),
  *   so the closest-due task is always first.
  * - The search box filters the list by task title or subject text.
  * - Tapping a task opens its detail page (app/task/[taskId].js).
